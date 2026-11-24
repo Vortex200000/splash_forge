@@ -8,6 +8,6 @@ class CreateAndr12LogoUseCase {
   CreateAndr12LogoUseCase(this._repo);
 
   Future<Either<Failure, Uint8List>> call(Uint8List logo,
-          {required double k, required bool useIconBg}) =>
-      _repo.createAndr12Logo(logo, k: k, useIconBg: useIconBg);
+          {required double k, required double radius, required bool useIconBg}) =>
+      _repo.createAndr12Logo(logo, k: k, radius: radius, useIconBg: useIconBg);
 }

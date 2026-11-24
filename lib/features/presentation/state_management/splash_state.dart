@@ -7,6 +7,7 @@ class SplashState extends Equatable {
   final Uint8List? android12;
   final Uint8List? legacy;
   final double k;
+  final double radius;
   final bool useIconBg;
   final Color splashColor;
   final Color iconBgColor;
@@ -18,6 +19,7 @@ class SplashState extends Equatable {
     this.android12,
     this.legacy,
     this.k = 0.22,
+    this.radius = 0,
     this.useIconBg = true,
     this.splashColor = const Color(0xFF002B36),
     this.iconBgColor = const Color(0xFF1A3F46),
@@ -31,6 +33,7 @@ class SplashState extends Equatable {
     Uint8List? android12,
     Uint8List? legacy,
     double? k,
+    double? radius,
     bool? useIconBg,
     Color? splashColor,
     Color? iconBgColor,
@@ -42,6 +45,7 @@ class SplashState extends Equatable {
         android12: android12 ?? this.android12,
         legacy: legacy ?? this.legacy,
         k: k ?? this.k,
+        radius: radius ?? this.radius,
         useIconBg: useIconBg ?? this.useIconBg,
         splashColor: splashColor ?? this.splashColor,
         iconBgColor: iconBgColor ?? this.iconBgColor,
@@ -50,6 +54,6 @@ class SplashState extends Equatable {
       );
 
   @override
-  List<Object?> get props => [logo, android12, legacy, k, useIconBg,
+  List<Object?> get props => [logo, android12, legacy, k, radius, useIconBg,
         splashColor, iconBgColor, busy, message];
 }

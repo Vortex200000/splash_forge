@@ -6,10 +6,14 @@ abstract class MainRepo {
   Future<Either<Failure, Uint8List>> createAndr12Logo(
     Uint8List logo, {
     required double k,
+    required double radius,
     required bool useIconBg,
   });
 
-  Future<Either<Failure, Uint8List>> createAndrLegacyLogo(Uint8List logo);
+  Future<Either<Failure, Uint8List>> createAndrLegacyLogo(
+    Uint8List logo, {
+    required double radius,
+  });
 
   Future<Either<Failure, Unit>> exportLogo({
     required Uint8List android12,

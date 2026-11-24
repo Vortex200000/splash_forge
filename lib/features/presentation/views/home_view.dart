@@ -51,6 +51,13 @@ class HomeView extends StatelessWidget {
                 onChanged: cubit.setK,
                 onChangeEnd: (_) => cubit.regenerate(),
               ),
+              const Text(AppStrings.logoRadius),
+              Slider(
+                value: s.radius,
+                max: 0.5,
+                onChanged: cubit.setRadius,
+                onChangeEnd: (_) => cubit.regenerate(),
+              ),
               const SizedBox(height: 8),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 _Phone(AppStrings.android12, s.splashColor, s.android12,

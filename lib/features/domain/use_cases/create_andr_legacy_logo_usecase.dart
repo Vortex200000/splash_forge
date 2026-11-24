@@ -7,6 +7,6 @@ class CreateAndrLegacyLogoUseCase {
   final MainRepo _repo;
   CreateAndrLegacyLogoUseCase(this._repo);
 
-  Future<Either<Failure, Uint8List>> call(Uint8List logo) =>
-      _repo.createAndrLegacyLogo(logo);
+  Future<Either<Failure, Uint8List>> call(Uint8List logo, {required double radius}) =>
+      _repo.createAndrLegacyLogo(logo, radius: radius);
 }

@@ -23,6 +23,7 @@ class SplashCubit extends Cubit<SplashState> {
 
   void setSplashColor(Color c) => emit(state.copyWith(splashColor: c));
   void setIconBgColor(Color c) => emit(state.copyWith(iconBgColor: c));
+  void setRadius(double v) => emit(state.copyWith(radius: v));
   void setK(double v) => emit(state.copyWith(k: v)); // call regenerate() on slider end
 
   Future<void> setUseIconBg(bool v) async {
@@ -35,8 +36,9 @@ class SplashCubit extends Cubit<SplashState> {
     if (logo == null) return;
     emit(state.copyWith(busy: true));
 
-    final r12 = await _createAndr12(logo, k: state.k, useIconBg: state.useIconBg);
-    final rl = await _createLegacy(logo);
+    final r12 = await _createAndr12(logo,
+        k: state.k, radius: state.radius, useIconBg: state.useIconBg);
+    final rl = await _createLegacy(logo, radius: state.radius);
 
     r12.fold(
       (f) => emit(state.copyWith(busy: false, message: f.message)),

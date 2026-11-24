@@ -1,13 +1,15 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:archive/archive.dart';
-import 'package:file_saver/file_saver.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../../core/constants/app_sizes.dart';
 
 abstract class LocalData {
   Future<Uint8List> createDesign(
     Uint8List logoBytes, {
-    double k = 0.22, // logo corner roundness
+    double k = 0.22, // roundness of the original logo
+    double radius = 0, // new corner radius applied to the logo
     bool useIconBg = true, // true -> 960 / 640, false -> 1152 / 768
     bool legacy = false, // Android 11 and below image
     bool includeCircle = false, // preview only
@@ -21,7 +23,7 @@ abstract class LocalData {
     required bool useIconBg,
   });
 
-  Future<void> saveZip(Map<String, List<int>> files);
+  Future<bool> saveZip(Map<String, List<int>> files);
 }
 
 class LocalDataImpl extends LocalData {
@@ -29,6 +31,7 @@ class LocalDataImpl extends LocalData {
   Future<Uint8List> createDesign(
     Uint8List logoBytes, {
     double k = 0.22,
+    double radius = 0,
     bool useIconBg = true,
     bool legacy = false,
     bool includeCircle = false,
@@ -63,20 +66,31 @@ class LocalDataImpl extends LocalData {
     // Step 3: logo centered inside the circle
     final codec = await ui.instantiateImageCodec(logoBytes);
     final logo = (await codec.getNextFrame()).image;
+    final kEff = k > radius ? k : radius;
     final box = legacy
         ? AppSizes.legacyLogo
-        : circleD / (1.4142 - 0.8284 * k) * AppSizes.safeMargin;
+        : circleD / (1.4142 - 0.8284 * kEff) * AppSizes.safeMargin;
     final r = box / (logo.width > logo.height ? logo.width : logo.height);
+    final dst = ui.Rect.fromCenter(
+        center: center, width: logo.width * r, height: logo.height * r);
 
+    if (radius > 0) {
+      final side = dst.width < dst.height ? dst.width : dst.height;
+      canvas.save();
+      canvas.clipRRect(
+        ui.RRect.fromRectAndRadius(dst, ui.Radius.circular(radius * side)),
+        doAntiAlias: true,
+      );
+    }
     canvas.drawImageRect(
       logo,
       ui.Rect.fromLTWH(0, 0, logo.width.toDouble(), logo.height.toDouble()),
-      ui.Rect.fromCenter(
-          center: center, width: logo.width * r, height: logo.height * r),
+      dst,
       ui.Paint()
         ..filterQuality = ui.FilterQuality.high
         ..isAntiAlias = true,
     );
+    if (radius > 0) canvas.restore();
 
     final img =
         await recorder.endRecording().toImage(size.toInt(), size.toInt());
@@ -100,15 +114,26 @@ flutter_native_splash:
 ''';
 
   @override
-  Future<void> saveZip(Map<String, List<int>> files) async {
+  Future<bool> saveZip(Map<String, List<int>> files) async {
     final zip = Archive();
     files.forEach(
         (name, data) => zip.addFile(ArchiveFile(name, data.length, data)));
-    await FileSaver.instance.saveFile(
-      name: 'splash-assets',
-      bytes: Uint8List.fromList(ZipEncoder().encode(zip)!),
-      fileExtension: 'zip',
-      mimeType: MimeType.zip,
+    final bytes = Uint8List.fromList(ZipEncoder().encode(zip)!);
+
+    // System dialog: the user picks the folder and file name
+    final path = await FilePicker.platform.saveFile(
+      dialogTitle: 'Save splash assets',
+      fileName: 'splash-assets.zip',
+      type: FileType.custom,
+      allowedExtensions: ['zip'],
+      bytes: bytes, // Android and iOS write the file themselves
     );
+    if (path == null) return false; // user cancelled
+
+    // On desktop the dialog only returns a path, so write the file here
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      await File(path).writeAsBytes(bytes);
+    }
+    return true;
   }
 }
