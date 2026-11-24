@@ -23,7 +23,7 @@ dependencies:
   file_saver: ^0.2.14
 
   # UI helpers
-  file_picker: ^8.1.0
+  file_picker: ^10.3.8
   flutter_colorpicker: ^1.1.0
 
 dev_dependencies:
