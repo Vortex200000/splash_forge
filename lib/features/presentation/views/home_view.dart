@@ -36,6 +36,8 @@ class HomeView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _ColorTile(AppStrings.splashColor, s.splashColor, cubit.setSplashColor),
+              const SizedBox(height: 8),
+              _ColorTile(AppStrings.splashColorDark, s.splashColorDark, cubit.setSplashColorDark),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text(AppStrings.useIconBg),
@@ -59,10 +61,20 @@ class HomeView extends StatelessWidget {
                 onChangeEnd: (_) => cubit.regenerate(),
               ),
               const SizedBox(height: 8),
+              const Text(AppStrings.previewLight),
+              const SizedBox(height: 5),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                _Phone(AppStrings.android12, s.splashColor, s.android12,
+                _Phone(AppStrings.android12, s.splashColor, s.android12,null,false,
                     circle: s.useIconBg ? s.iconBgColor : null, useCircle: true),
-                _Phone(AppStrings.legacy, s.splashColor, s.legacy),
+                _Phone(AppStrings.legacy, s.splashColor, s.legacy,null,false),
+              ]),
+              const SizedBox(height: 8),
+              const Text(AppStrings.previewDark),
+              const SizedBox(height: 5),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                _Phone(AppStrings.android12, s.splashColor, s.android12,s.splashColorDark,true,
+                    circle: s.useIconBg ? s.iconBgColor : null, useCircle: true),
+                _Phone(AppStrings.legacy, s.splashColor, s.legacy,s.splashColorDark,true),
               ]),
               const SizedBox(height: 24),
               FilledButton(
@@ -110,7 +122,9 @@ class _Phone extends StatelessWidget {
   final Uint8List? image;
   final Color? circle;
   final bool useCircle;
-  const _Phone(this.label, this.bg, this.image, {this.circle, this.useCircle = false});
+  final Color? splashDark;
+  final bool isDark;
+  const _Phone(this.label, this.bg, this.image, this.splashDark, this.isDark,{this.circle, this.useCircle = false});
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +146,7 @@ class _Phone extends StatelessWidget {
       Container(
         width: 150, height: 300, alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: bg,
+          color:isDark? splashDark! : bg,
           borderRadius: BorderRadius.circular(26),
           border: Border.all(color: const Color(0xFF27272A), width: 5),
         ),

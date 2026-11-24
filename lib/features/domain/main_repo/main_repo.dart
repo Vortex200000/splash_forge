@@ -19,6 +19,7 @@ abstract class MainRepo {
     required Uint8List android12,
     required Uint8List legacy,
     required String splashColor,
+    required String splashColorDark,
     required String iconBgColor,
     required bool useIconBg,
   });

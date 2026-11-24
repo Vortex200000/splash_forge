@@ -11,6 +11,7 @@ class ExportLogoUseCase {
     required Uint8List android12,
     required Uint8List legacy,
     required String splashColor,
+        required String splashColorDark,
     required String iconBgColor,
     required bool useIconBg,
   }) =>
@@ -18,6 +19,7 @@ class ExportLogoUseCase {
           android12: android12,
           legacy: legacy,
           splashColor: splashColor,
+    splashColorDark : splashColorDark,
           iconBgColor: iconBgColor,
           useIconBg: useIconBg);
 }

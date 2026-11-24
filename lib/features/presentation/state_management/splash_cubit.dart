@@ -22,6 +22,7 @@ class SplashCubit extends Cubit<SplashState> {
   }
 
   void setSplashColor(Color c) => emit(state.copyWith(splashColor: c));
+  void setSplashColorDark(Color c) => emit(state.copyWith(splashColorDark: c));
   void setIconBgColor(Color c) => emit(state.copyWith(iconBgColor: c));
   void setRadius(double v) => emit(state.copyWith(radius: v));
   void setK(double v) => emit(state.copyWith(k: v)); // call regenerate() on slider end
@@ -60,6 +61,7 @@ class SplashCubit extends Cubit<SplashState> {
       android12: a12,
       legacy: leg,
       splashColor: state.splashColor.hex,
+      splashColorDark :state.splashColorDark.hex,
       iconBgColor: state.iconBgColor.hex,
       useIconBg: state.useIconBg,
     );

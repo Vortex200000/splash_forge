@@ -20,6 +20,7 @@ abstract class LocalData {
   String buildYaml({
     required String splashColor,
     required String iconBgColor,
+    required String splashColorDark,
     required bool useIconBg,
   });
 
@@ -102,14 +103,17 @@ class LocalDataImpl extends LocalData {
   String buildYaml({
     required String splashColor,
     required String iconBgColor,
+    required String splashColorDark,
     required bool useIconBg,
   }) =>
       '''
 flutter_native_splash:
   color: "$splashColor"
   image: assets/splash/logo.png
+  color_dark: "$splashColorDark"
   android_12:
     image: assets/splash/logo_android12.png
+    color_dark: "$splashColorDark"
     color: "$splashColor"${useIconBg ? '\n    icon_background_color: "$iconBgColor"' : ''}
 ''';
 

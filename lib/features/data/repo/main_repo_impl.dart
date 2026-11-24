@@ -40,6 +40,7 @@ class MainRepoImpl implements MainRepo {
     required Uint8List android12,
     required Uint8List legacy,
     required String splashColor,
+    required String splashColorDark,
     required String iconBgColor,
     required bool useIconBg,
   }) async {
@@ -47,6 +48,7 @@ class MainRepoImpl implements MainRepo {
       final yaml = _local.buildYaml(
           splashColor: splashColor,
           iconBgColor: iconBgColor,
+          splashColorDark : splashColorDark,
           useIconBg: useIconBg);
       final saved = await _local.saveZip({
         'assets/splash/logo_android12.png': android12,

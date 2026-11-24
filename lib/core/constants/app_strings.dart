@@ -2,6 +2,9 @@ class AppStrings {
   static const appName = 'Splash Forge';
   static const pickLogo = 'Choose logo';
   static const splashColor = 'Splash background';
+  static const previewLight = 'Light mode preview';
+  static const previewDark = 'Dark mode preview';
+  static const splashColorDark = 'Splash background dark';
   static const iconBgColor = 'Icon background';
   static const useIconBg = 'Use icon background (Android 12+)';
   static const roundness = 'Original logo roundness';
