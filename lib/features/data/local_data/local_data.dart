@@ -107,7 +107,7 @@ flutter_native_splash:
     await FileSaver.instance.saveFile(
       name: 'splash-assets',
       bytes: Uint8List.fromList(ZipEncoder().encode(zip)!),
-      fileExtension: 'zip',
+      ext: 'zip',
       mimeType: MimeType.zip,
     );
   }
