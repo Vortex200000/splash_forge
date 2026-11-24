@@ -128,7 +128,7 @@ flutter_native_splash:
       type: FileType.custom,
       allowedExtensions: ['zip'],
       bytes: bytes, // Android and iOS write the file themselves
-
+)
     await FileSaver.instance.saveFile(
       name: 'splash-assets',
       bytes: Uint8List.fromList(ZipEncoder().encode(zip)!),
