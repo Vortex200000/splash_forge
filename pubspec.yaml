@@ -25,6 +25,7 @@ dependencies:
   # UI helpers
   file_picker: ^10.3.8
   flutter_colorpicker: ^1.1.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -33,3 +34,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/logo_android12.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/logo_android12.png"
