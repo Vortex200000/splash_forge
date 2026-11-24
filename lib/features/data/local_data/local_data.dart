@@ -118,6 +118,7 @@ flutter_native_splash:
     final zip = Archive();
     files.forEach(
         (name, data) => zip.addFile(ArchiveFile(name, data.length, data)));
+<<<<<<< HEAD
     final bytes = Uint8List.fromList(ZipEncoder().encode(zip)!);
 
     // System dialog: the user picks the folder and file name
@@ -127,6 +128,13 @@ flutter_native_splash:
       type: FileType.custom,
       allowedExtensions: ['zip'],
       bytes: bytes, // Android and iOS write the file themselves
+=======
+    await FileSaver.instance.saveFile(
+      name: 'splash-assets',
+      bytes: Uint8List.fromList(ZipEncoder().encode(zip)!),
+      ext: 'zip',
+      mimeType: MimeType.zip,
+>>>>>>> 619ac6b81dff9d2dbf1bf05e0dbc727d3ea47c1c
     );
     if (path == null) return false; // user cancelled
 
