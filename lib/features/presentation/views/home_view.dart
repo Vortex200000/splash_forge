@@ -4,18 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/settings_strings.dart';
 import '../../../core/di/service_locator.dart';
 import '../../../core/helpers/color_helper.dart';
+import '../../domain/entities/app_settings.dart';
+import '../state_management/settings_cubit.dart';
 import '../state_management/splash_cubit.dart';
 import '../state_management/splash_state.dart';
+import 'designs_view.dart';
+import 'image_tools_view.dart';
+import 'settings_view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final settingsCubit = getIt<SettingsCubit>();
     return BlocProvider(
-      create: (_) => getIt<SplashCubit>(),
+      // a new design starts from the defaults chosen in Settings
+      create: (_) => getIt<SplashCubit>()..applyDefaults(settingsCubit.state.settings),
       child: BlocConsumer<SplashCubit, SplashState>(
         listenWhen: (a, b) => b.message != null,
         listener: (context, s) => ScaffoldMessenger.of(context)
@@ -23,7 +31,29 @@ class HomeView extends StatelessWidget {
         builder: (context, s) {
           final cubit = context.read<SplashCubit>();
           return Scaffold(
-            appBar: AppBar(title: const Text(AppStrings.appName)),
+            appBar: AppBar(
+              title: const Text(AppStrings.appName),
+              actions: [
+                IconButton(
+                  tooltip: SettingsStrings.myDesigns,
+                  icon: const Icon(Icons.folder_open),
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const DesignsView())),
+                ),
+                IconButton(
+                  tooltip: 'Image tools',
+                  icon: const Icon(Icons.auto_fix_high),
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const ImageToolsView())),
+                ),
+                IconButton(
+                  tooltip: SettingsStrings.settings,
+                  icon: const Icon(Icons.settings),
+                  onPressed: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const SettingsView())),
+                ),
+              ],
+            ),
             body: ListView(padding: const EdgeInsets.all(16), children: [
               FilledButton.tonal(
                 onPressed: () async {
@@ -61,34 +91,86 @@ class HomeView extends StatelessWidget {
                 onChangeEnd: (_) => cubit.regenerate(),
               ),
               const SizedBox(height: 8),
-              const Text(AppStrings.previewLight),
-              const SizedBox(height: 5),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                _Phone(AppStrings.android12, s.splashColor, s.android12,null,false,
-                    circle: s.useIconBg ? s.iconBgColor : null, useCircle: true),
-                _Phone(AppStrings.legacy, s.splashColor, s.legacy,null,false),
-              ]),
-              const SizedBox(height: 8),
-              const Text(AppStrings.previewDark),
-              const SizedBox(height: 5),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                _Phone(AppStrings.android12, s.splashColor, s.android12,s.splashColorDark,true,
-                    circle: s.useIconBg ? s.iconBgColor : null, useCircle: true),
-                _Phone(AppStrings.legacy, s.splashColor, s.legacy,s.splashColorDark,true),
-              ]),
+              // 4 devices or a light / dark toggle, chosen in Settings
+              BlocBuilder<SettingsCubit, SettingsState>(
+                bloc: settingsCubit,
+                buildWhen: (a, b) => a.settings.previewMode != b.settings.previewMode,
+                builder: (_, ss) => ss.settings.previewMode == PreviewMode.both
+                    ? _BothPreviews(s)
+                    : _TogglePreviews(s, cubit),
+              ),
               const SizedBox(height: 24),
               FilledButton(
-                onPressed: s.busy ? null : cubit.export,
+                onPressed: s.busy
+                    ? null
+                    : () => cubit.export(autoSave: settingsCubit.state.settings.autoSave),
                 child: s.busy
                     ? const SizedBox(width: 18, height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2))
                     : const Text(AppStrings.export),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: s.busy ? null : cubit.saveDesign,
+                child: const Text(SettingsStrings.saveDesign),
               ),
             ]),
           );
         },
       ),
     );
+  }
+}
+
+class _BothPreviews extends StatelessWidget {
+  final SplashState s;
+  const _BothPreviews(this.s);
+
+  @override
+  Widget build(BuildContext context) => Column(children: [
+        const Text(AppStrings.previewLight),
+        const SizedBox(height: 5),
+        _PhonesRow(s, dark: false),
+        const SizedBox(height: 8),
+        const Text(AppStrings.previewDark),
+        const SizedBox(height: 5),
+        _PhonesRow(s, dark: true),
+      ]);
+}
+
+class _TogglePreviews extends StatelessWidget {
+  final SplashState s;
+  final SplashCubit cubit;
+  const _TogglePreviews(this.s, this.cubit);
+
+  @override
+  Widget build(BuildContext context) => Column(children: [
+        SegmentedButton<bool>(
+          segments: const [
+            ButtonSegment(value: false, label: Text(SettingsStrings.themeLight)),
+            ButtonSegment(value: true, label: Text(SettingsStrings.themeDark)),
+          ],
+          selected: {s.previewDark},
+          onSelectionChanged: (v) => cubit.setPreviewDark(v.first),
+        ),
+        const SizedBox(height: 12),
+        _PhonesRow(s, dark: s.previewDark),
+      ]);
+}
+
+class _PhonesRow extends StatelessWidget {
+  final SplashState s;
+  final bool dark;
+  const _PhonesRow(this.s, {required this.dark});
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = dark ? s.splashColorDark : s.splashColor;
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      _Phone(AppStrings.android12, bg, s.android12,
+          circle: s.useIconBg ? s.iconBgColor : null, useCircle: true),
+      _Phone(AppStrings.legacy, bg, s.legacy),
+    ]);
   }
 }
 
@@ -122,9 +204,7 @@ class _Phone extends StatelessWidget {
   final Uint8List? image;
   final Color? circle;
   final bool useCircle;
-  final Color? splashDark;
-  final bool isDark;
-  const _Phone(this.label, this.bg, this.image, this.splashDark, this.isDark,{this.circle, this.useCircle = false});
+  const _Phone(this.label, this.bg, this.image, {this.circle, this.useCircle = false});
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +226,7 @@ class _Phone extends StatelessWidget {
       Container(
         width: 150, height: 300, alignment: Alignment.center,
         decoration: BoxDecoration(
-          color:isDark? splashDark! : bg,
+          color: bg,
           borderRadius: BorderRadius.circular(26),
           border: Border.all(color: const Color(0xFF27272A), width: 5),
         ),

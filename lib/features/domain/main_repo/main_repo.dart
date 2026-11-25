@@ -23,4 +23,13 @@ abstract class MainRepo {
     required String iconBgColor,
     required bool useIconBg,
   });
+
+  Future<Either<Failure, Map<String, List<int>>>> buildExportFiles({
+    required Uint8List android12,
+    required Uint8List legacy,
+    required String splashColor,
+    required String splashColorDark,
+    required String iconBgColor,
+    required bool useIconBg,
+  });
 }

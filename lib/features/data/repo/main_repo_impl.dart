@@ -35,6 +35,48 @@ class MainRepoImpl implements MainRepo {
     }
   }
 
+  Map<String, List<int>> _files({
+    required Uint8List android12,
+    required Uint8List legacy,
+    required String splashColor,
+    required String splashColorDark,
+    required String iconBgColor,
+    required bool useIconBg,
+  }) {
+    final yaml = _local.buildYaml(
+        splashColor: splashColor,
+        iconBgColor: iconBgColor,
+        splashColorDark: splashColorDark,
+        useIconBg: useIconBg);
+    return {
+      'assets/splash/logo_android12.png': android12,
+      'assets/splash/logo.png': legacy,
+      'flutter_native_splash.yaml': yaml.codeUnits,
+    };
+  }
+
+  @override
+  Future<Either<Failure, Map<String, List<int>>>> buildExportFiles({
+    required Uint8List android12,
+    required Uint8List legacy,
+    required String splashColor,
+    required String splashColorDark,
+    required String iconBgColor,
+    required bool useIconBg,
+  }) async {
+    try {
+      return Right(_files(
+          android12: android12,
+          legacy: legacy,
+          splashColor: splashColor,
+          splashColorDark: splashColorDark,
+          iconBgColor: iconBgColor,
+          useIconBg: useIconBg));
+    } catch (e) {
+      return Left(Failure(e.toString()));
+    }
+  }
+
   @override
   Future<Either<Failure, Unit>> exportLogo({
     required Uint8List android12,
@@ -45,16 +87,13 @@ class MainRepoImpl implements MainRepo {
     required bool useIconBg,
   }) async {
     try {
-      final yaml = _local.buildYaml(
+      final saved = await _local.saveZip(_files(
+          android12: android12,
+          legacy: legacy,
           splashColor: splashColor,
+          splashColorDark: splashColorDark,
           iconBgColor: iconBgColor,
-          splashColorDark : splashColorDark,
-          useIconBg: useIconBg);
-      final saved = await _local.saveZip({
-        'assets/splash/logo_android12.png': android12,
-        'assets/splash/logo.png': legacy,
-        'flutter_native_splash.yaml': yaml.codeUnits,
-      });
+          useIconBg: useIconBg));
       if (!saved) return const Left(Failure(AppStrings.exportCancelled));
       return const Right(unit);
     } catch (e) {

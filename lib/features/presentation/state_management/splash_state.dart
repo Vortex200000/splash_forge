@@ -12,6 +12,7 @@ class SplashState extends Equatable {
   final Color splashColor;
   final Color splashColorDark;
   final Color iconBgColor;
+  final bool previewDark; // used by the light / dark toggle preview
   final bool busy;
   final String? message;
 
@@ -22,9 +23,10 @@ class SplashState extends Equatable {
     this.k = 0.22,
     this.radius = 0,
     this.useIconBg = true,
-    this.splashColor = const Color(0xFF002B36),
+    this.splashColor = const Color(0xFFFFFFFF),
     this.splashColorDark = const Color(0xFF002B36),
     this.iconBgColor = const Color(0xFF1A3F46),
+    this.previewDark = false,
     this.busy = false,
     this.message,
   });
@@ -38,8 +40,9 @@ class SplashState extends Equatable {
     double? radius,
     bool? useIconBg,
     Color? splashColor,
-  Color?  splashColorDark,
+    Color? splashColorDark,
     Color? iconBgColor,
+    bool? previewDark,
     bool? busy,
     String? message,
   }) =>
@@ -51,15 +54,14 @@ class SplashState extends Equatable {
         radius: radius ?? this.radius,
         useIconBg: useIconBg ?? this.useIconBg,
         splashColor: splashColor ?? this.splashColor,
-    splashColorDark: splashColorDark ?? this.splashColorDark,
+        splashColorDark: splashColorDark ?? this.splashColorDark,
         iconBgColor: iconBgColor ?? this.iconBgColor,
+        previewDark: previewDark ?? this.previewDark,
         busy: busy ?? this.busy,
         message: message,
       );
 
   @override
   List<Object?> get props => [logo, android12, legacy, k, radius, useIconBg,
-        splashColor, iconBgColor, busy, message,
-                             splashColorDark
-                             ];
+        splashColor, splashColorDark, iconBgColor, previewDark, busy, message];
 }
